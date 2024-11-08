@@ -14,11 +14,11 @@ MIDDLE_C = 60
 
 CHAR_FLAT = '♭'
 
-CHAR_FLAT_RE = '\u266D'
+CHAR_FLAT_UNICODE = '\u266D'
 
 CHAR_SHARP = '♯'
 
-CHAR_SHARP_RE = '\u266F'
+CHAR_SHARP_UNICODE = '\u266F'
 
 NOTE_TABLE = {
 	0:		('C-1', 'C', -1, 8.176),
@@ -544,7 +544,7 @@ FREQUENCIES = [
 	12543.850
 ]
 
-NOTE_RELATIVE = {
+NOTE_OFFSETS = {
 	'Cb':		-1,
 	'C':		0,
 	'C#':		1,
@@ -996,32 +996,118 @@ MIDI_DRUM_NAMES = {
 
 class Note:
 
+	_name_values = {
+		'A': {' ': 9, '#': 10, 'b': 8},
+		'B': {' ': 11, '#': 12, 'b': 10},
+		'C': {' ': 0, '#': 1, 'b': -1},
+		'D': {' ': 2, '#': 3, 'b': 1},
+		'E': {' ': 4, '#': 5, 'b': 3},
+		'F': {' ': 5, '#': 6, 'b': 4},
+		'G': {' ': 7, '#': 8, 'b': 6}
+	}
+
+	_pitch_values = {
+		0:	{' ': 'C'},
+		1:	{'#': 'C', 'b': 'D'},
+		2:	{' ': 'D'},
+		3:	{'#': 'D', 'b': 'E'},
+		4:	{' ': 'E', 'b': 'F'},
+		5:	{' ': 'F', '#': 'E'},
+		6:	{'#': 'F', 'b': 'G'},
+		7:	{' ': 'G'},
+		8:	{'#': 'G', 'b': 'A'},
+		9:	{' ': 'A'},
+		10:	{'#': 'A', 'b': 'B'},
+		11:	{' ': 'B'}
+	}
+
+	_incidental_strings = {
+		' ' : ['', '', ''],
+		'b' : ['b', CHAR_FLAT_UNICODE, ' flat '],
+		'#' : ['#', CHAR_SHARP_UNICODE, ' sharp ']
+	}
+
+	_incidental_equiv = {
+		' '					: ' ',
+		'b'					: 'b',
+		CHAR_FLAT_UNICODE	: 'b',
+		'flat'				: 'b',
+		'#'					: '#',
+		CHAR_SHARP_UNICODE	: '#',
+		'sharp'				: '#'
+	}
+
 	_name_reg = re.compile(
 		'([ABCDEFG])' + \
 		'[\s\-\.]*' + \
 		'([\u266D|\u266F|#|b|sharp|flat])*' + \
-		'[\s\.]*(\-)?(\d*)',
+		'[\s\.]*' + \
+		'(\-)?(\d)?',
 		re.IGNORECASE
 	)
 	_float_reg = re.compile('^(\d)*\.(\d)*$')
 	_int_reg = re.compile('^(\d)+$')
 
+	INCIDENTAL_ASCII = 0
+	INCIDENTAL_UNICODE = 1
+	INCIDENTAL_NAMES = 2
+
 	# Set these using Note.<prop> to override for all new Note instances:
 	lcase_name = False
-	unicode_incidentals = False
+	incidentals_style = INCIDENTAL_ASCII
 	prefer_flats = False
 
 	def __init__(self, val):
-		if re.match(Note._float_reg, val):
-			self.pitch = Note.nearest_pitch(float(val))
-		elif re.match(Note._int_reg, val):
-			self.pitch = int(val)
+		if isinstance(val, int):
+			self.pitch = val
 		else:
-			m = re.match(Note._name_reg, val)
-			if m:
-				letter, incidental, neg, octave = m.groups()
+			if self._float_reg.match(val):
+				self.__pitch = Note.nearest_pitch(float(val))
+			elif self._int_reg.match(val):
+				self.__pitch = int(val)
 			else:
-				raise ValueError
+				m = self._name_reg.match(val)
+				if m is None:
+					raise ValueError
+				letter, incid, neg, octave = m.groups()
+				if octave is None:
+					self.__octave = 3
+				elif neg == '1':
+					if octave == '1':
+						self.__octave = -1
+					else:
+						raise ValueError('Octave cannot be less than -1')
+				else:
+					self.__octave = int(octave)
+					if self.__octave > 9:
+						raise ValueError('Octave cannot be greater than 9')
+				if incid is None:
+					incid = ' '
+				else:
+					incid = self._incidental_equiv[incid] \
+						if incid in self._incidental_equiv \
+						else self._incidental_equiv[incid.lower()]
+				self.__note_value = self._name_values[letter.upper()][incid]
+				self.__pitch = self.__note_value + (self.__octave + 1) * 12
+
+	def __str__(self):
+		pl = self._pitch_values[self.__note_value]
+		if ' ' in pl:
+			name = pl[' ']
+			incid = ' '
+		elif self.prefer_flats:
+			name = pl['b']
+			incid = 'b'
+		else:
+			name = pl['#']
+			incid = '#'
+		if self.lcase_name:
+			name = name.lower()
+		incid = self._incidental_strings[incid][self.incidentals_style]
+		return f"{name}{incid}{self.octave}"
+
+	def __int__(self):
+		return self.__pitch
 
 	@property
 	def pitch(self):
@@ -1031,23 +1117,34 @@ class Note:
 	def pitch(self, val):
 		self.__pitch = int(val)
 		self.__octave = floor(self.__pitch / 12) - 1
-		self.__note = self.__pitch % 12
+		self.__note_value = self.__pitch % 12
 
 	@property
-	def note(self):
-		return self.__note
+	def note_value(self):
+		return self.__note_value
 
 	@property
 	def octave(self):
 		return self.__octave
 
+	@property
+	def frequency(self):
+		return FREQUENCIES[self.__pitch]
+
 	@classmethod
-	def nearest_pitch(cls, f):
-		pos = bisect_left(FREQUENCIES, f)
+	def nearest_pitch(cls, frequency):
+		pos = bisect_left(FREQUENCIES, frequency)
 		if pos == len(FREQUENCIES):
 			return len(FREQUENCIES)
 		elif pos == 0:
 			return 0
-		diff_a = abs(f - FREQUENCIES[pos - 1])
-		diff_b = abs(f - FREQUENCIES[pos])
+		diff_a = abs(frequency - FREQUENCIES[pos - 1])
+		diff_b = abs(frequency - FREQUENCIES[pos])
 		return pos if diff_b < diff_a else pos - 1
+
+	@classmethod
+	def nearest_to(cls, frequency):
+		return Note(cls.nearest_pitch(frequency))
+
+
+#  end midi_notes/__init__.py
