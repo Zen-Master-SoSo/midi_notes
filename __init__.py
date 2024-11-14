@@ -1068,7 +1068,7 @@ class Note:
 			else:
 				m = self._name_reg.match(val)
 				if m is None:
-					raise ValueError
+					raise ValueError()
 				letter, incid, neg, octave = m.groups()
 				if octave is None:
 					self.__octave = 3
