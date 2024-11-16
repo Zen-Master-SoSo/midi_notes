@@ -893,7 +893,7 @@ MIDI_DRUM_NUMBERS = {
 	'open_triangle'		: 81
 }
 
-MIDI_DRUM_KEYS = {
+MIDI_DRUM_IDS = {
 	35	: 'acoustic_base_drum',
 	36	: 'bass_drum_1',
 	37	: 'side_stick',
