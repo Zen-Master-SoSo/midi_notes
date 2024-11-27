@@ -843,7 +843,7 @@ MIDI_PROGRAM_NAMES = {
 	128:	'Gunshot'
 }
 
-MIDI_DRUM_NUMBERS = {
+MIDI_DRUM_PITCHES = {
 	'acoustic_base_drum': 35,
 	'bass_drum_1'		: 36,
 	'side_stick'		: 37,
