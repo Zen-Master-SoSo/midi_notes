@@ -1,6 +1,7 @@
 #  midi_notes/__init__.py
 #
 #  Copyright 2024 liyang <liyang@veronica>
+#
 import re
 from math import floor
 from bisect import bisect_left
