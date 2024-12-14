@@ -1111,6 +1111,10 @@ class Note:
 		return self.__pitch
 
 	@property
+	def name(self):
+		return self.__str__()
+
+	@property
 	def pitch(self):
 		return self.__pitch
 
