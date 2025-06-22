@@ -945,7 +945,7 @@ MIDI_DRUM_IDS = {
 }
 
 MIDI_DRUM_NAMES = {
-	35	: 'Acoustic Base Drum',
+	35	: 'Acoustic Bass Drum',
 	36	: 'Bass Drum 1',
 	37	: 'Side Stick',
 	38	: 'Acoustic Snare',
