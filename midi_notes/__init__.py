@@ -2,23 +2,21 @@
 #
 #  Copyright 2024 liyang <liyang@veronica>
 #
+"""
+Various tables (dicts) and functions for converting between note names, midi
+note numbers, frequencies, plus a single "Note" class which allows you to
+switch seamlessly between pitch/note name/frequency representations.
+"""
 import re
 from math import floor
 from bisect import bisect_left
 
-"""
-Various tables (dicts) and functions for converting between note names, midi
-note numbers, frequencies.
-"""
+__version__ = "1.0.0"
 
 MIDDLE_C = 60
-
 CHAR_FLAT = '♭'
-
 CHAR_FLAT_UNICODE = '\u266D'
-
 CHAR_SHARP = '♯'
-
 CHAR_SHARP_UNICODE = '\u266F'
 
 NOTE_TABLE = {
@@ -599,9 +597,9 @@ FLATS = {
 	11:	'B'
 }
 
-MAJOR_SCALE = [0, 2, 4, 5, 7, 9, 11]
+MAJOR_SCALE_INTERVALS = [0, 2, 4, 5, 7, 9, 11]
 
-MINOR_SCALE = [0, 2, 3, 5, 7, 8, 10]
+MINOR_SCALE_INTERVALS = [0, 2, 3, 5, 7, 8, 10]
 
 COMMON_MAJOR_KEYS = [
 	'Db', 'Ab', 'Eb', 'Bb', 'F',
@@ -623,21 +621,6 @@ MAJOR_SCALES = {
 	'F#':	 [6, 8, 10, 11, 1, 3, 5]
 }
 
-MAJOR_SCALE_TUPLES = {
-	'Db':	 [(1, 'Db'), (3, 'Eb'), (5, 'F'), (6, 'Gb'), (8, 'Ab'), (10, 'Bb'), (0, 'C')],
-	'Ab':	 [(8, 'Ab'), (10, 'Bb'), (0, 'C'), (1, 'Db'), (3, 'Eb'), (5, 'F'), (7, 'G')],
-	'Eb':	 [(3, 'Eb'), (5, 'F'), (7, 'G'), (8, 'Ab'), (10, 'Bb'), (0, 'C'), (2, 'D')],
-	'Bb':	 [(10, 'Bb'), (0, 'C'), (2, 'D'), (3, 'Eb'), (5, 'F'), (7, 'G'), (9, 'A')],
-	'F':	 [(5, 'F'), (7, 'G'), (9, 'A'), (10, 'A#'), (0, 'C'), (2, 'D'), (4, 'E')],
-	'C':	 [(0, 'C'), (2, 'D'), (4, 'E'), (5, 'F'), (7, 'G'), (9, 'A'), (11, 'B')],
-	'G':	 [(7, 'G'), (9, 'A'), (11, 'B'), (0, 'C'), (2, 'D'), (4, 'E'), (6, 'F#')],
-	'D':	 [(2, 'D'), (4, 'E'), (6, 'F#'), (7, 'G'), (9, 'A'), (11, 'B'), (1, 'C#')],
-	'A':	 [(9, 'A'), (11, 'B'), (1, 'C#'), (2, 'D'), (4, 'E'), (6, 'F#'), (8, 'G#')],
-	'E':	 [(4, 'E'), (6, 'F#'), (8, 'G#'), (9, 'A'), (11, 'B'), (1, 'C#'), (3, 'D#')],
-	'B':	 [(11, 'B'), (1, 'C#'), (3, 'D#'), (4, 'E'), (6, 'F#'), (8, 'G#'), (10, 'A#')],
-	'F#':	 [(6, 'F#'), (8, 'G#'), (10, 'A#'), (11, 'B'), (1, 'C#'), (3, 'D#'), (5, 'F')]
-}
-
 COMMON_MINOR_KEYS = [
 	'Bb', 'F', 'C', 'G', 'D',
 	'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#'
@@ -656,21 +639,6 @@ MINOR_SCALES = {
 	'C#':	 [1, 3, 4, 6, 8, 9, 11],
 	'G#':	 [8, 10, 11, 1, 3, 4, 6],
 	'D#':	 [3, 5, 6, 8, 10, 11, 1]
-}
-
-MINOR_SCALE_TUPLES = {
-	'Bb':	 [(10, 'Bb'), (0, 'C'), (1, 'Db'), (3, 'Eb'), (5, 'F'), (6, 'Gb'), (8, 'Ab')],
-	'F':	 [(5, 'F'), (7, 'G'), (8, 'G#'), (10, 'A#'), (0, 'C'), (1, 'C#'), (3, 'D#')],
-	'C':	 [(0, 'C'), (2, 'D'), (3, 'D#'), (5, 'F'), (7, 'G'), (8, 'G#'), (10, 'A#')],
-	'G':	 [(7, 'G'), (9, 'A'), (10, 'A#'), (0, 'C'), (2, 'D'), (3, 'D#'), (5, 'F')],
-	'D':	 [(2, 'D'), (4, 'E'), (5, 'F'), (7, 'G'), (9, 'A'), (10, 'A#'), (0, 'C')],
-	'A':	 [(9, 'A'), (11, 'B'), (0, 'C'), (2, 'D'), (4, 'E'), (5, 'F'), (7, 'G')],
-	'E':	 [(4, 'E'), (6, 'F#'), (7, 'G'), (9, 'A'), (11, 'B'), (0, 'C'), (2, 'D')],
-	'B':	 [(11, 'B'), (1, 'C#'), (2, 'D'), (4, 'E'), (6, 'F#'), (7, 'G'), (9, 'A')],
-	'F#':	 [(6, 'F#'), (8, 'G#'), (9, 'A'), (11, 'B'), (1, 'C#'), (2, 'D'), (4, 'E')],
-	'C#':	 [(1, 'C#'), (3, 'D#'), (4, 'E'), (6, 'F#'), (8, 'G#'), (9, 'A'), (11, 'B')],
-	'G#':	 [(8, 'G#'), (10, 'A#'), (11, 'B'), (1, 'C#'), (3, 'D#'), (4, 'E'), (6, 'F#')],
-	'D#':	 [(3, 'D#'), (5, 'F'), (6, 'F#'), (8, 'G#'), (10, 'A#'), (11, 'B'), (1, 'C#')]
 }
 
 DURATION_NAMES = {
@@ -703,15 +671,16 @@ DURATION_FRACTIONS = {
 	1.0:		'1'
 }
 
-MIDI_STAT_CTRL = 0xBF
+# MIDI event status bytes
+# <status_byte> & 0xF0 will equal one of the following values:
+MIDI_NOTE_OFF		= 0x80	# 0x8n,x1,x2 - Note Off (x1 = note number, x2 = velocity).
+MIDI_NOTE_ON		= 0x90	# 0x9n,x1,x2 - Note On  (x1 = note number, x2 = velocity [x2=0 -> note off]).
+MIDI_POLY_PRESSURE	= 0xA0	# 0xBn,x1,x2 - Poly Pressure (x1 = note number, x2 = pressure value).
+MIDI_CONTROL_CHANGE	= 0xB0	# 0xCn,x1,x2 - Control Change (x1 = controller number, x2 = value).
+MIDI_PROGRAM_SELECT	= 0xC0	# 0xCn,x1    - Program Change (x1 = program number).
+MIDI_PRESSURE		= 0xD0	# 0xDn,x1    - Channel (Mono) Pressure (x1 = value).
+MIDI_PITCH_BEND		= 0xE0	# 0xEn,x1,x2 - Pitch Bend (x1 = LSB, x2 = MSB).
 
-MIDI_NOTE_ON = 0x90			# 1449n,x1,x2 - Note On  (x1 = note number, x2 = velocity [x2=0 -> note off]).
-
-MIDI_NOTE_OFF = 0x80		# 1288n,x1,x2 - Note Off (x1 = note number, x2 = velocity).
-
-MIDI_CONTROL_CHANGE = 0xB0	# 176Bn,x1,x2 - Control Change (x1 = controller number, x2 = value).
-
-MIDI_PROGRAM_SELECT = 0xC0
 
 MIDI_PROGRAM_NAMES = {
 	1:		'Acoustic Grand Piano',
@@ -844,56 +813,6 @@ MIDI_PROGRAM_NAMES = {
 	128:	'Gunshot'
 }
 
-MIDI_DRUM_PITCHES = {
-	'acoustic_base_drum': 35,
-	'bass_drum_1'		: 36,
-	'side_stick'		: 37,
-	'acoustic_snare'	: 38,
-	'hand_clap'			: 39,
-	'electric_snare'	: 40,
-	'low_floor_tom'		: 41,
-	'closed_hi_hat'		: 42,
-	'high_floor_tom'	: 43,
-	'pedal_hi_hat'		: 44,
-	'low_tom'			: 45,
-	'open_hi_hat'		: 46,
-	'low_mid_tom'		: 47,
-	'hi_mid_tom'		: 48,
-	'crash_cymbal_1'	: 49,
-	'high_tom'			: 50,
-	'ride_cymbal_1'		: 51,
-	'chinese_cymbal'	: 52,
-	'ride_bell'			: 53,
-	'tambourine'		: 54,
-	'splash_cymbal'		: 55,
-	'cowbell'			: 56,
-	'crash_cymbal_2'	: 57,
-	'vibraslap'			: 58,
-	'ride_cymbal_2'		: 59,
-	'hi_bongo'			: 60,
-	'low_bongo'			: 61,
-	'mute_hi_conga'		: 62,
-	'open_hi_conga'		: 63,
-	'low_conga'			: 64,
-	'high_timbale'		: 65,
-	'low_timbale'		: 66,
-	'high_agogo'		: 67,
-	'low_agogo'			: 68,
-	'cabasa'			: 69,
-	'maracas'			: 70,
-	'short_whistle'		: 71,
-	'long_whistle'		: 72,
-	'short_guiro'		: 73,
-	'long_guiro'		: 74,
-	'claves'			: 75,
-	'hi_wood_block'		: 76,
-	'low_wood_block'	: 77,
-	'mute_cuica'		: 78,
-	'open_cuica'		: 79,
-	'mute_triangle'		: 80,
-	'open_triangle'		: 81
-}
-
 MIDI_DRUM_IDS = {
 	35	: 'acoustic_base_drum',
 	36	: 'bass_drum_1',
@@ -942,6 +861,56 @@ MIDI_DRUM_IDS = {
 	79	: 'open_cuica',
 	80	: 'mute_triangle',
 	81	: 'open_triangle'
+}
+
+MIDI_DRUM_PITCHES = {
+	'acoustic_base_drum': 35,
+	'bass_drum_1'		: 36,
+	'side_stick'		: 37,
+	'acoustic_snare'	: 38,
+	'hand_clap'			: 39,
+	'electric_snare'	: 40,
+	'low_floor_tom'		: 41,
+	'closed_hi_hat'		: 42,
+	'high_floor_tom'	: 43,
+	'pedal_hi_hat'		: 44,
+	'low_tom'			: 45,
+	'open_hi_hat'		: 46,
+	'low_mid_tom'		: 47,
+	'hi_mid_tom'		: 48,
+	'crash_cymbal_1'	: 49,
+	'high_tom'			: 50,
+	'ride_cymbal_1'		: 51,
+	'chinese_cymbal'	: 52,
+	'ride_bell'			: 53,
+	'tambourine'		: 54,
+	'splash_cymbal'		: 55,
+	'cowbell'			: 56,
+	'crash_cymbal_2'	: 57,
+	'vibraslap'			: 58,
+	'ride_cymbal_2'		: 59,
+	'hi_bongo'			: 60,
+	'low_bongo'			: 61,
+	'mute_hi_conga'		: 62,
+	'open_hi_conga'		: 63,
+	'low_conga'			: 64,
+	'high_timbale'		: 65,
+	'low_timbale'		: 66,
+	'high_agogo'		: 67,
+	'low_agogo'			: 68,
+	'cabasa'			: 69,
+	'maracas'			: 70,
+	'short_whistle'		: 71,
+	'long_whistle'		: 72,
+	'short_guiro'		: 73,
+	'long_guiro'		: 74,
+	'claves'			: 75,
+	'hi_wood_block'		: 76,
+	'low_wood_block'	: 77,
+	'mute_cuica'		: 78,
+	'open_cuica'		: 79,
+	'mute_triangle'		: 80,
+	'open_triangle'		: 81
 }
 
 MIDI_DRUM_NAMES = {
@@ -1061,11 +1030,13 @@ class Note:
 	def __init__(self, val):
 		if isinstance(val, int):
 			self.pitch = val
+		elif isinstance(val, float):
+			self.pitch = Note.nearest_pitch(val)
 		else:
 			if self._float_reg.match(val):
-				self.__pitch = Note.nearest_pitch(float(val))
+				self.pitch = Note.nearest_pitch(float(val))
 			elif self._int_reg.match(val):
-				self.__pitch = int(val)
+				self.pitch = int(val)
 			else:
 				m = self._name_reg.match(val)
 				if m is None:
@@ -1125,11 +1096,17 @@ class Note:
 		self.__note_value = self.__pitch % 12
 
 	@property
-	def note_value(self):
+	def interval_above_c(self):
+		"""
+		Returns the number of half-steps above note "C" in this Note's octave.
+		"""
 		return self.__note_value
 
 	@property
 	def octave(self):
+		"""
+		Returns this Note's octave.
+		"""
 		return self.__octave
 
 	@property
