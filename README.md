@@ -1,8 +1,8 @@
 # midi_notes
 
-Provides various tables (dicts) and functions for converting between note
-names, midi note numbers, frequencies, plus a single "Note" class which allows
-you to switch seamlessly between pitch/note name/frequency representations.
+Provides various tables (dicts) and functions for looking up / converting note
+names, scales, midi note pitch, frequencies, an a "Note" class which allows you
+constuct / represent Notes by MIDI pitch, note name or frequency.
 
 ## Note class
 
