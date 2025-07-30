@@ -15,8 +15,10 @@ __version__ = "1.0.1"
 
 MIDDLE_C = 60
 CHAR_FLAT = '♭'
+CHAR_FLAT_ASCII = 'b'
 CHAR_FLAT_UNICODE = '\u266D'
 CHAR_SHARP = '♯'
+CHAR_SHARP_ASCII = '#'
 CHAR_SHARP_UNICODE = '\u266F'
 
 NOTE_TABLE = {
@@ -150,138 +152,138 @@ NOTE_TABLE = {
 	127:		('G9', 'G', 9, 12543.850)
 }
 
-NOTE_NAMES = {
-	0:		'C-1',
-	1:		'C#-1',
-	2:		'D-1',
-	3:		'D#-1',
-	4:		'E-1',
-	5:		'F-1',
-	6:		'F#-1',
-	7:		'G-1',
-	8:		'G#-1',
-	9:		'A-1',
-	10:		'A#-1',
-	11:		'B-1',
-	12:		'C0',
-	13:		'C#0',
-	14:		'D0',
-	15:		'D#0',
-	16:		'E0',
-	17:		'F0',
-	18:		'F#0',
-	19:		'G0',
-	20:		'G#0',
-	21:		'A0',
-	22:		'A#0',
-	23:		'B0',
-	24:		'C1',
-	25:		'C#1',
-	26:		'D1',
-	27:		'D#1',
-	28:		'E1',
-	29:		'F1',
-	30:		'F#1',
-	31:		'G1',
-	32:		'G#1',
-	33:		'A1',
-	34:		'A#1',
-	35:		'B1',
-	36:		'C2',
-	37:		'C#2',
-	38:		'D2',
-	39:		'D#2',
-	40:		'E2',
-	41:		'F2',
-	42:		'F#2',
-	43:		'G2',
-	44:		'G#2',
-	45:		'A2',
-	46:		'A#2',
-	47:		'B2',
-	48:		'C3',
-	49:		'C#3',
-	50:		'D3',
-	51:		'D#3',
-	52:		'E3',
-	53:		'F3',
-	54:		'F#3',
-	55:		'G3',
-	56:		'G#3',
-	57:		'A3',
-	58:		'A#3',
-	59:		'B3',
-	60:		'C4',
-	61:		'C#4',
-	62:		'D4',
-	63:		'D#4',
-	64:		'E4',
-	65:		'F4',
-	66:		'F#4',
-	67:		'G4',
-	68:		'G#4',
-	69:		'A4',
-	70:		'A#4',
-	71:		'B4',
-	72:		'C5',
-	73:		'C#5',
-	74:		'D5',
-	75:		'D#5',
-	76:		'E5',
-	77:		'F5',
-	78:		'F#5',
-	79:		'G5',
-	80:		'G#5',
-	81:		'A5',
-	82:		'A#5',
-	83:		'B5',
-	84:		'C6',
-	85:		'C#6',
-	86:		'D6',
-	87:		'D#6',
-	88:		'E6',
-	89:		'F6',
-	90:		'F#6',
-	91:		'G6',
-	92:		'G#6',
-	93:		'A6',
-	94:		'A#6',
-	95:		'B6',
-	96:		'C7',
-	97:		'C#7',
-	98:		'D7',
-	99:		'D#7',
-	100:	'E7',
-	101:	'F7',
-	102:	'F#7',
-	103:	'G7',
-	104:	'G#7',
-	105:	'A7',
-	106:	'A#7',
-	107:	'B7',
-	108:	'C8',
-	109:	'C#8',
-	110:	'D8',
-	111:	'D#8',
-	112:	'E8',
-	113:	'F8',
-	114:	'F#8',
-	115:	'G8',
-	116:	'G#8',
-	117:	'A8',
-	118:	'A#8',
-	119:	'B8',
-	120:	'C9',
-	121:	'C#9',
-	122:	'D9',
-	123:	'D#9',
-	124:	'E9',
-	125:	'F9',
-	126:	'F#9',
-	127:	'G9'
-}
+NOTE_NAMES = [
+	'C-1',
+	'C#-1',
+	'D-1',
+	'D#-1',
+	'E-1',
+	'F-1',
+	'F#-1',
+	'G-1',
+	'G#-1',
+	'A-1',
+	'A#-1',
+	'B-1',
+	'C0',
+	'C#0',
+	'D0',
+	'D#0',
+	'E0',
+	'F0',
+	'F#0',
+	'G0',
+	'G#0',
+	'A0',
+	'A#0',
+	'B0',
+	'C1',
+	'C#1',
+	'D1',
+	'D#1',
+	'E1',
+	'F1',
+	'F#1',
+	'G1',
+	'G#1',
+	'A1',
+	'A#1',
+	'B1',
+	'C2',
+	'C#2',
+	'D2',
+	'D#2',
+	'E2',
+	'F2',
+	'F#2',
+	'G2',
+	'G#2',
+	'A2',
+	'A#2',
+	'B2',
+	'C3',
+	'C#3',
+	'D3',
+	'D#3',
+	'E3',
+	'F3',
+	'F#3',
+	'G3',
+	'G#3',
+	'A3',
+	'A#3',
+	'B3',
+	'C4',
+	'C#4',
+	'D4',
+	'D#4',
+	'E4',
+	'F4',
+	'F#4',
+	'G4',
+	'G#4',
+	'A4',
+	'A#4',
+	'B4',
+	'C5',
+	'C#5',
+	'D5',
+	'D#5',
+	'E5',
+	'F5',
+	'F#5',
+	'G5',
+	'G#5',
+	'A5',
+	'A#5',
+	'B5',
+	'C6',
+	'C#6',
+	'D6',
+	'D#6',
+	'E6',
+	'F6',
+	'F#6',
+	'G6',
+	'G#6',
+	'A6',
+	'A#6',
+	'B6',
+	'C7',
+	'C#7',
+	'D7',
+	'D#7',
+	'E7',
+	'F7',
+	'F#7',
+	'G7',
+	'G#7',
+	'A7',
+	'A#7',
+	'B7',
+	'C8',
+	'C#8',
+	'D8',
+	'D#8',
+	'E8',
+	'F8',
+	'F#8',
+	'G8',
+	'G#8',
+	'A8',
+	'A#8',
+	'B8',
+	'C9',
+	'C#9',
+	'D9',
+	'D#9',
+	'E9',
+	'F9',
+	'F#9',
+	'G9'
+]
 
-NOTE_NUMBERS = {
+NOTE_PITCHES = {
 	'C-1':		0,
 	'C#-1':		1,
 	'D-1':		2,
@@ -412,7 +414,7 @@ NOTE_NUMBERS = {
 	'G9':		127
 }
 
-FREQUENCIES = [
+NOTE_FREQUENCIES = [
 	8.176,
 	8.662,
 	9.177,
@@ -567,7 +569,7 @@ NOTE_OFFSETS = {
 	'B#':		12
 }
 
-SHARPS = {
+NOTE_NAME_SHARPS = {
 	0:	'C',
 	1:	'C#',
 	2:	'D',
@@ -582,7 +584,7 @@ SHARPS = {
 	11:	'B'
 }
 
-FLATS = {
+NOTE_NAME_FLATS = {
 	0:	'C',
 	1:	'Db',
 	2:	'D',
@@ -601,11 +603,6 @@ MAJOR_SCALE_INTERVALS = [0, 2, 4, 5, 7, 9, 11]
 
 MINOR_SCALE_INTERVALS = [0, 2, 3, 5, 7, 8, 10]
 
-COMMON_MAJOR_KEYS = [
-	'Db', 'Ab', 'Eb', 'Bb', 'F',
-	'C', 'G', 'D', 'A', 'E', 'B', 'F#',
-]
-
 MAJOR_SCALES = {
 	'Db':	 [1, 3, 5, 6, 8, 10, 0],
 	'Ab':	 [8, 10, 0, 1, 3, 5, 7],
@@ -621,11 +618,6 @@ MAJOR_SCALES = {
 	'F#':	 [6, 8, 10, 11, 1, 3, 5]
 }
 
-COMMON_MINOR_KEYS = [
-	'Bb', 'F', 'C', 'G', 'D',
-	'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#'
-]
-
 MINOR_SCALES = {
 	'Bb':	 [10, 0, 1, 3, 5, 6, 8],
 	'F':	 [5, 7, 8, 10, 0, 1, 3],
@@ -640,6 +632,16 @@ MINOR_SCALES = {
 	'G#':	 [8, 10, 11, 1, 3, 4, 6],
 	'D#':	 [3, 5, 6, 8, 10, 11, 1]
 }
+
+COMMON_MAJOR_KEYS = [
+	'Db', 'Ab', 'Eb', 'Bb', 'F',
+	'C', 'G', 'D', 'A', 'E', 'B', 'F#',
+]
+
+COMMON_MINOR_KEYS = [
+	'Bb', 'F', 'C', 'G', 'D',
+	'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#'
+]
 
 DURATION_NAMES = {
 	0.015625:	'64th',
@@ -993,8 +995,8 @@ class Note:
 
 	_incidental_strings = {
 		' ' : ['', '', ''],
-		'b' : ['b', CHAR_FLAT_UNICODE, ' flat '],
-		'#' : ['#', CHAR_SHARP_UNICODE, ' sharp ']
+		'b' : [CHAR_FLAT_ASCII, CHAR_FLAT_UNICODE, ' flat '],
+		'#' : [CHAR_SHARP_ASCII, CHAR_SHARP_UNICODE, ' sharp ']
 	}
 
 	_incidental_equiv = {
@@ -1111,17 +1113,17 @@ class Note:
 
 	@property
 	def frequency(self):
-		return FREQUENCIES[self.__pitch]
+		return NOTE_FREQUENCIES[self.__pitch]
 
 	@classmethod
 	def nearest_pitch(cls, frequency):
-		pos = bisect_left(FREQUENCIES, frequency)
-		if pos == len(FREQUENCIES):
-			return len(FREQUENCIES)
+		pos = bisect_left(NOTE_FREQUENCIES, frequency)
+		if pos == len(NOTE_FREQUENCIES):
+			return len(NOTE_FREQUENCIES)
 		elif pos == 0:
 			return 0
-		diff_a = abs(frequency - FREQUENCIES[pos - 1])
-		diff_b = abs(frequency - FREQUENCIES[pos])
+		diff_a = abs(frequency - NOTE_FREQUENCIES[pos - 1])
+		diff_b = abs(frequency - NOTE_FREQUENCIES[pos])
 		return pos if diff_b < diff_a else pos - 1
 
 	@classmethod
