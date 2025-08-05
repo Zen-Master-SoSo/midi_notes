@@ -11,7 +11,7 @@ import re
 from math import floor
 from bisect import bisect_left
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 MIDDLE_C = 60
 CHAR_FLAT = '♭'
