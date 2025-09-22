@@ -1,6 +1,6 @@
 #  midi_notes/__init__.py
 #
-#  Copyright 2024 liyang <liyang@veronica>
+#  Copyright 2024 Leon Dionne <ldionne@dridesign.sh.cn>
 #
 """
 Various tables (dicts) and functions for converting between note names, midi
