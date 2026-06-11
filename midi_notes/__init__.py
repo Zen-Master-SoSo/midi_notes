@@ -599,6 +599,19 @@ NOTE_NAME_FLATS = {
 	11:	'B'
 }
 
+INCIDENTAL_VARIANTS = {
+	'b'					: 'b',
+	CHAR_FLAT_ASCII		: 'b',
+	CHAR_FLAT_UNICODE	: 'b',
+	'flat'				: 'b',
+	None				: None,
+	' '					: None,
+	'#'					: '#',
+	CHAR_SHARP_ASCII	: '#',
+	CHAR_SHARP_UNICODE	: '#',
+	'sharp'				: '#'
+}
+
 MAJOR_SCALE_INTERVALS = [0, 2, 4, 5, 7, 9, 11]
 
 MINOR_SCALE_INTERVALS = [0, 2, 3, 5, 7, 8, 10]
@@ -967,86 +980,123 @@ MIDI_DRUM_NAMES = {
 
 
 class Note:
+	"""
+	An Note abstraction.
+
+	You can construct a Note using an integer pitch in the range 0-127, a float
+	value representing a frequency, or a string representation of the note using
+	common note naming syntax. All of the following are valid:
+
+		"a"		"a#"	"a#4"	"a sharp 4"
+		"A"		"A#"	"A#4"	"A sharp 4"
+
+		"b"		"bb"	"b♭4"	"b flat 4"
+		"B"		"Bb"	"B♭4"	"B flat 4"
+
+	The following attributes control how the note value is returned as a string:
+
+	lcase_name
+		If true, return note name as lowercase (i.e. "c")
+
+	incidentals_style
+		Controls how incidentals are rendered.
+		May be one of:
+			Note.INCIDENTAL_CHAR		"b" or "#"
+			Note.INCIDENTAL_ASCII		"♭" or "♯"
+			Note.INCIDENTAL_UNICODE		unicode \u266D or \u266F
+			Note.INCIDENTAL_NAMES		"flat" or "sharp"
+
+	prefer_flats
+		Incidentals are by default represented as the previous note's "sharp".
+
+		Setting this value to True causes incidentals to be represented as the
+		next note's "flat". ("D#" is represented as "Eb")
+
+	These class variables may be set these using the convention:
+
+		"Note.<attribute>"
+
+	Doing so overrides these preferences for every note when returning the string
+	representation of all Note instances, (unless the value is set on a particular
+	Note instance).
+
+	"""
 
 	_name_values = {
-		'A': {' ': 9, '#': 10, 'b': 8},
-		'B': {' ': 11, '#': 12, 'b': 10},
-		'C': {' ': 0, '#': 1, 'b': -1},
-		'D': {' ': 2, '#': 3, 'b': 1},
-		'E': {' ': 4, '#': 5, 'b': 3},
-		'F': {' ': 5, '#': 6, 'b': 4},
-		'G': {' ': 7, '#': 8, 'b': 6}
+		'C': {None: 0, '#': 1, 'b': -1},
+		'D': {None: 2, '#': 3, 'b': 1},
+		'E': {None: 4, '#': 5, 'b': 3},
+		'F': {None: 5, '#': 6, 'b': 4},
+		'G': {None: 7, '#': 8, 'b': 6},
+		'A': {None: 9, '#': 10, 'b': 8},
+		'B': {None: 11, '#': 12, 'b': 10}
 	}
 
 	_pitch_values = {
-		0:	{' ': 'C'},
+		-1:	{None: 'B'},
+		0:	{None: 'C'},
 		1:	{'#': 'C', 'b': 'D'},
-		2:	{' ': 'D'},
+		2:	{None: 'D'},
 		3:	{'#': 'D', 'b': 'E'},
-		4:	{' ': 'E', 'b': 'F'},
-		5:	{' ': 'F', '#': 'E'},
+		4:	{None: 'E', 'b': 'F'},
+		5:	{None: 'F', '#': 'E'},
 		6:	{'#': 'F', 'b': 'G'},
-		7:	{' ': 'G'},
+		7:	{None: 'G'},
 		8:	{'#': 'G', 'b': 'A'},
-		9:	{' ': 'A'},
+		9:	{None: 'A'},
 		10:	{'#': 'A', 'b': 'B'},
-		11:	{' ': 'B'}
+		11:	{None: 'B'},
+		12:	{None: 'C'}
 	}
 
 	_incidental_strings = {
-		' ' : ['', '', ''],
-		'b' : [CHAR_FLAT_ASCII, CHAR_FLAT_UNICODE, ' flat '],
-		'#' : [CHAR_SHARP_ASCII, CHAR_SHARP_UNICODE, ' sharp ']
-	}
-
-	_incidental_equiv = {
-		' '					: ' ',
-		'b'					: 'b',
-		CHAR_FLAT_UNICODE	: 'b',
-		'flat'				: 'b',
-		'#'					: '#',
-		CHAR_SHARP_UNICODE	: '#',
-		'sharp'				: '#'
+		None	: ['', '', '', ''],
+		'b'		: [CHAR_FLAT, CHAR_FLAT_ASCII, CHAR_FLAT_UNICODE, ' flat '],
+		'#' 	: [CHAR_SHARP, CHAR_SHARP_ASCII, CHAR_SHARP_UNICODE, ' sharp ']
 	}
 
 	_name_reg = re.compile(
 		'([ABCDEFG])' + \
-		'[\s\-\.]*' + \
-		'([\u266D|\u266F|#|b|sharp|flat])*' + \
 		'[\s\.]*' + \
-		'(\-)?(\d)?',
+		'(\u266D|\u266F|#|b|sharp|flat)?' + \
+		'[\s\.]*' + \
+		'([\-])?' + \
+		'(\d)?',
 		re.IGNORECASE
 	)
 	_float_reg = re.compile('^(\d)*\.(\d)*$')
 	_int_reg = re.compile('^(\d)+$')
 
-	INCIDENTAL_ASCII = 0
-	INCIDENTAL_UNICODE = 1
-	INCIDENTAL_NAMES = 2
+	INCIDENTAL_CHAR = 0
+	INCIDENTAL_ASCII = 1
+	INCIDENTAL_UNICODE = 2
+	INCIDENTAL_NAMES = 3
 
-	# Set these using Note.<prop> to override for all new Note instances:
 	lcase_name = False
 	incidentals_style = INCIDENTAL_ASCII
 	prefer_flats = False
 
-	def __init__(self, val):
-		if isinstance(val, int):
-			self.pitch = val
-		elif isinstance(val, float):
-			self.pitch = Note.nearest_pitch(val)
+	given_value = None
+
+	def __init__(self, value):
+		self.given_value = value
+		if isinstance(value, int):
+			self.pitch = value
+		elif isinstance(value, float):
+			self.pitch = Note.nearest_pitch(value)
 		else:
-			if self._float_reg.match(val):
-				self.pitch = Note.nearest_pitch(float(val))
-			elif self._int_reg.match(val):
-				self.pitch = int(val)
+			if self._float_reg.match(value):
+				self.pitch = Note.nearest_pitch(float(value))
+			elif isinstance(value, str) and value.isdigit():
+				self.pitch = int(value)
 			else:
-				m = self._name_reg.match(val)
+				m = self._name_reg.match(value)
 				if m is None:
-					raise ValueError()
+					raise NoteNameError(value)
 				letter, incid, neg, octave = m.groups()
 				if octave is None:
 					self.__octave = 3
-				elif neg == '1':
+				elif neg == '-':
 					if octave == '1':
 						self.__octave = -1
 					else:
@@ -1055,30 +1105,33 @@ class Note:
 					self.__octave = int(octave)
 					if self.__octave > 9:
 						raise ValueError('Octave cannot be greater than 9')
-				if incid is None:
-					incid = ' '
-				else:
-					incid = self._incidental_equiv[incid] \
-						if incid in self._incidental_equiv \
-						else self._incidental_equiv[incid.lower()]
+				try:
+					incid = INCIDENTAL_VARIANTS[incid] \
+						if incid in INCIDENTAL_VARIANTS \
+						else INCIDENTAL_VARIANTS[incid.lower()]
+				except KeyError as err:
+					raise NoteNameError(value) from err
 				self.__note_value = self._name_values[letter.upper()][incid]
 				self.__pitch = self.__note_value + (self.__octave + 1) * 12
 
 	def __str__(self):
-		pl = self._pitch_values[self.__note_value]
-		if ' ' in pl:
-			name = pl[' ']
-			incid = ' '
+		pitch_offset = self._pitch_values[self.__note_value]
+		if None in pitch_offset:
+			name = pitch_offset[None]
+			incid = None
 		elif self.prefer_flats:
-			name = pl['b']
+			name = pitch_offset['b']
 			incid = 'b'
 		else:
-			name = pl['#']
+			name = pitch_offset['#']
 			incid = '#'
 		if self.lcase_name:
 			name = name.lower()
 		incid = self._incidental_strings[incid][self.incidentals_style]
 		return f"{name}{incid}{self.octave}"
+
+	def __format__(self, format_spec):
+		return str(self).__format__(format_spec)
 
 	def __int__(self):
 		return self.__pitch
@@ -1129,6 +1182,12 @@ class Note:
 	@classmethod
 	def nearest_to(cls, frequency):
 		return Note(cls.nearest_pitch(frequency))
+
+
+class NoteNameError(ValueError):
+
+	def __init__(self, note_name):
+		super().__init__(f'Invalid note name: "{note_name}"')
 
 
 #  end midi_notes/__init__.py
